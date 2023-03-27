@@ -20,15 +20,26 @@ Route::group(['middleware' => ['api', 'checkPassword', 'changeLanguage'], 'names
     Route::post('get-category-byId', 'CategoriesController@getCategoryById');
     Route::post('change-category-status', 'CategoriesController@changeStatus');
 
-    Route::group(['prefix' => 'admin','namespace'=>'Api\Admin'], function () {
+    Route::group(['prefix' => 'admin', 'namespace' => ' Admin'], function () {
         Route::post('login', 'AuthController@login');
         Route::post('logout', 'AuthController@logout')->middleware('auth.guard:admin-api');
 
     });
 
-});
+    Route::group(['prefix' => 'user', 'namespace' => 'User'], function () {
+        Route::post('login', 'AuthController@Login');
+    });
 
-Route::group(['middleware' => ['api', 'checkPassword', 'changeLanguage', 'checkAdminToken'], 'namespace' => 'Api'], function () {
-    Route::get('offers', 'CategoriesController@index');
+
+    Route::group(['prefix' => 'user', 'middleware' => 'auth.guard:user-api'], function () {
+        Route::post('profile', function () {
+            return \Auth::user(); // return authenticated user data
+        });
+
+    });
+
+    Route::group(['middleware' => ['api', 'checkPassword', 'changeLanguage', 'checkAdminToken'], 'namespace' => 'Api'], function () {
+        Route::get('offers', 'CategoriesController@index');
+    });
 });
 
